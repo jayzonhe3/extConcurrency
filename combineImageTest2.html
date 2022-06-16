@@ -1,0 +1,131 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>CAD Model Image Compare</title>
+	<script type="text/javascript" src="com/pixastic/pixastic.js"></script>
+	
+</head>
+
+<body style="width: 2100px">
+	<div style="text-align: center; width: 1800px">
+		<h2>This prototype shows the difference between two compared model states via image
+		</br>
+		<span style="color: orangered">Orange shows features that are removed from the current version in the compared version</span>
+		<br/>
+		<span style="color: dodgerblue">Blue shows features that are new to current version</span></h1>
+	</div>
+	<div style="width:600px; float:right; text-align: center" id="imageSource"></div>
+	<div style="width:200px; float:left">
+		<form action="" method="get">
+			<h3>Current state</h3>
+			<select id="selectModel" size="1" onChange="clickOption(this.selectedIndex)">
+				<option value="0">CAD Model (0)</option>
+				<option value="1">CAD Model (1)</option>
+				<option value="2">CAD Model (2)</option>
+				<option value="3">CAD Model (3)</option>
+				<option value="4">CAD Model (4)</option>
+				<option value="5">CAD Model (5)</option>
+				<option value="6" selected="selected">CAD Model (6)</option>
+				<option value="7">CAD Model (7)</option>
+				<option value="8">CAD Model (8)</option>
+				<option value="9">CAD Model (9)</option>
+				<option value="10">CAD Model (10)</option>
+				<option value="11">CAD Model (11)</option>
+				<option value="12">CAD Model (12)</option>
+				<option value="13">CAD Model (13)</option>
+				<option value="14">CAD Model (14)</option>
+				<option value="15">CAD Model (15)</option>
+				<option value="16">CAD Model (16)</option>
+				<option value="17">CAD Model (17)</option>
+				<option value="18">CAD Model (18)</option>
+				<option value="19">CAD Model (19)</option>
+				<option value="20">CAD Model (20)</option>
+				<option value="21">CAD Model (21)</option>
+			</select>
+			<h3>Comparing state</h3>
+			<select id="compareModel" size="22" onChange="clickCompareOption(this.selectedIndex)">
+				<option value="0">CAD Model (0)</option>
+				<option value="1">CAD Model (1)</option>
+				<option value="2">CAD Model (2)</option>
+				<option value="3">CAD Model (3)</option>
+				<option value="4">CAD Model (4)</option>
+				<option value="5">CAD Model (5)</option>
+				<option value="6">CAD Model (6)</option>
+				<option value="7">CAD Model (7)</option>
+				<option value="8">CAD Model (8)</option>
+				<option value="9">CAD Model (9)</option>
+				<option value="10">CAD Model (10)</option>
+				<option value="11">CAD Model (11)</option>
+				<option value="12">CAD Model (12)</option>
+				<option value="13">CAD Model (13)</option>
+				<option value="14">CAD Model (14)</option>
+				<option value="15">CAD Model (15)</option>
+				<option value="16">CAD Model (16)</option>
+				<option value="17">CAD Model (17)</option>
+				<option value="18">CAD Model (18)</option>
+				<option value="19" selected="selected">CAD Model (19)</option>
+				<option value="20">CAD Model (20)</option>
+				<option value="21">CAD Model (21)</option>
+			</select>
+		</form>
+	</div>
+	<script language="javascript">
+		var imageCount = 22;
+	 	var imageList = [];
+		for(var i=1; i<=imageCount; i++){
+			imageList.push("images/CADModel-" + i + ".png");
+		}
+		function clickOption(index){
+			img1count = index;
+			redrawImageCompare();
+		}
+		function clickCompareOption(index){
+			img2count = index;
+			redrawImageCompare();
+		}
+		var img ;
+		var blendImg ;
+		var img1count = 6;
+		var img2count = 19;
+		redrawImageCompare();
+		function redrawImageCompare(){
+			var forward = (img2count > img1count);
+			
+			if(img !== null && img !== undefined){
+				var tempImg = document.getElementById("myImage");
+				document.body.removeChild(tempImg);
+			}
+			img = new Image();
+			imgCopy = new Image();
+			blendImgCopy = new Image();
+			
+			img.onload = function() {
+				blendImg = new Image();
+				blendImg.onload = function() {
+					var desatImg = Pixastic.process(img, "desaturate", {average:true});
+					var desatBlendImg = Pixastic.process(blendImg, "desaturate", {average:true});
+					desatImg = Pixastic.process(desatImg, "coloradjust", {red:0, green:1, blue:1});
+					desatBlendImg = Pixastic.process(desatBlendImg, "coloradjust", {red:1, green:0, blue:0});
+					var img2 = Pixastic.process(desatImg, "blend", {amount:1, mode:"difference", image:desatBlendImg});
+					var img3 = Pixastic.process(img2, "hsl", {hue:20, saturation:0, lightness:0 });
+					Pixastic.process(img3, "invert");
+				}
+				blendImg.src = imageList[img1count];
+				
+			}
+			imgCopy.src = img.src = imageList[img2count];
+			blendImgCopy.src = imageList[img1count];
+			img.id = "myImage";
+			document.body.appendChild(img);
+			//clear previous images before adding the new ones
+			document.getElementById("imageSource").innerHTML = "<b>Current state</b>";
+			document.getElementById("imageSource").appendChild(blendImgCopy);
+			blendImgCopy.width = imgCopy.width = 600;
+			document.getElementById("imageSource").innerHTML = document.getElementById("imageSource").innerHTML + "<b>Compared state</b>";
+			document.getElementById("imageSource").appendChild(imgCopy);
+			
+		}
+	</script>
+</body>
+</html>
